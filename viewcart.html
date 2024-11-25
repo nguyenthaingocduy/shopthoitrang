@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yody - Giỏ hàng</title>
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="plugins/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/main_styles.css">
+    <link rel="stylesheet" type="text/css" href="styles/responsive.css">
+    <link rel="stylesheet" type="text/css" href="styles/catalogue_styles.css">
+    <style>
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+        }
+        .cart-item img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .product-info {
+            flex-grow: 1;
+        }
+        .product-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .product-variant {
+            color: #757575;
+            font-size: 14px;
+        }
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .current-price {
+            color: #2a2a86;
+            font-weight: bold;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #757575;
+            margin-right: 10px;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+        .quantity-control button {
+            width: 30px;
+            height: 30px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .quantity-control input {
+            width: 40px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #ccc;
+            margin: 0 5px;
+        }
+        .remove-btn {
+            color: #2a2a86;
+            cursor: pointer;
+            margin-left: 12px;
+            margin-top: 24px;
+        }
+        .flash-sale {
+            color: #2a2a86;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .sale-badge {
+            background-color: #2a2a86;
+            color: white;
+            padding: 2px 5px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .checkout-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .cart-container {
+            margin-bottom: 100px; /* Add space for the fixed checkout section */
+        }
+        .empty-cart-message {
+            text-align: center;
+            margin-top: 25px;
+            padding: 20px;
+            font-size: 18px;
+            color: #757575;
+        }
+    </style>
+</head>
+<body>
+    <div class="super_container">
+        <!-- Header -->
+        <header class="header trans_300">
+            <!-- Main Navigation -->
+            <div class="main_nav_container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <div class="logo_container">
+                                <!-- <a href="#">colo<span>shop</span></a> -->
+                                <a href="index.html">
+                                    <img src="images/yody/yody_logo.png" alt="Yody logo" style="border: none; width: 100%;">
+                                </a>
+                            </div>
+                            <nav class="navbar">
+                                <ul class="navbar_menu">
+                                    <li><a href="catalogue.html">shop</a></li>
+								    <li><a href="#">ưu đãi</a></li> <!--promotion.html-->
+								    <li><a href="#">tin tức</a></li> <!--blog.html-->
+								    <li><a href="contact.html">liên hệ</a></li>
+                                </ul>
+                                <ul class="navbar_user">
+                                    <li><a href="#"><i class="fa fa-search" aria-hidden="true"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i></a></li>
+                                    
+                                </ul>
+                                <div class="hamburger_container">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container cart-container" style="margin-top: 150px;">
+            <h2>Giỏ hàng của bạn</h2>
+            <div id="cartItems"></div>
+            <div id="emptyCartMessage" class="empty-cart-message" style="display: none;">
+                Giỏ hàng của bạn đang trống
+            </div>
+        </div>
+        
+        <div class="checkout-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h4 class="mb-0">Tổng cộng: <span id="totalPrice">₫0</span></h4>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <button class="btn btn-primary btn-confirm-pay" onclick="checkout()">Mua hàng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="styles/bootstrap4/popper.js"></script>
+    <script src="styles/bootstrap4/bootstrap.min.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        function displayCart() {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const cartContainer = document.getElementById('cartItems');
+            const emptyCartMessage = document.getElementById('emptyCartMessage');
+            const yourCart = document.getElementById('your-cart');
+            let totalPrice = 0;
+
+            cartContainer.innerHTML = '';
+
+            if (cartItems.length === 0) {
+                emptyCartMessage.style.display = 'block';
+                document.querySelector('.checkout-section').style.display = 'none';
+            } else {
+                emptyCartMessage.style.display = 'none';
+                document.querySelector('.checkout-section').style.display = 'block';
+
+                cartItems.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item d-flex align-items-center';
+                    itemElement.innerHTML = `
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="product-info">
+                            <div class="product-title">${item.name}</div>
+                            
+                            
+                            <div class="price-info">
+                                <div>
+                                    <span class="current-price">${(parseFloat(item.price) || 0).toLocaleString()}đ</span>
+                                    
+                                </div>
+                                <div class="quantity-control">
+                                    <button onclick="updateQuantity('${item.name}', -1)">-</button>
+                                    <input type="text" value="${item.quantity}" readonly>
+                                    <button onclick="updateQuantity('${item.name}', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="remove-btn" onclick="removeItem('${item.name}', '${item.image}')">Xóa</div>
+                    `;
+                    cartContainer.appendChild(itemElement);
+                    totalPrice += parseFloat(item.price) * item.quantity;
+                });
+            }
+
+            document.getElementById('totalPrice').textContent = totalPrice.toLocaleString() + 'đ';
+        }
+
+        function updateQuantity(name, change) {
+            let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const item = cartItems.find(item => item.name === name);
+            if (item) {
+                if (item.quantity === 1 && change === -1) {
+                    showDeleteConfirmation(() => {
+                        removeItem(item.name, item.image); // Delete item if confirmed
+                    });
+                } else {
+                    item.quantity = Math.max(1, item.quantity + change);
+                    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                    displayCart();
+                }
+            }
+        }
+        
+        function showDeleteConfirmation(onConfirm) {
+            // Create overlay and popup elements
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = '1000';
+
+            const popup = document.createElement('div');
+            popup.style.backgroundColor = '#fff';
+            popup.style.padding = '20px';
+            popup.style.borderRadius = '8px';
+            popup.style.textAlign = 'center';
+            popup.style.maxWidth = '300px';
+
+            const message = document.createElement('p');
+            message.textContent = 'Bạn có muốn xóa sản phẩm này từ giỏ hàng của bạn không?';
+            message.style.fontSize = '16px';
+            message.style.color = 'black';
+
+            const yesButton = document.createElement('button');
+            yesButton.textContent = 'Yes';
+            yesButton.style.margin = '5px';
+            yesButton.style.padding = '10px 25px 10px 25px';
+            yesButton.style.cursor = 'pointer';
+            yesButton.style.border = 'none';
+            yesButton.style.width = 'auto';
+            yesButton.style.height = '40px';
+            yesButton.style.background = '#fcaf17';
+            yesButton.style.color = '#ffffff';
+            yesButton.style.borderRadius = '3px';
+            yesButton.onclick = function () {
+                onConfirm(); // Call the confirm function
+                document.body.removeChild(overlay); // Close popup
+            };
+
+            const noButton = document.createElement('button');
+            noButton.textContent = 'No';
+            noButton.style.margin = '5px 5px 5px 100px';
+            noButton.style.padding = '10px 25px 10px 25px';
+            noButton.style.cursor = 'pointer';
+            noButton.style.border = 'none';
+            noButton.style.width = 'auto';
+            noButton.style.height = '40px';
+            noButton.style.background = '#fcaf17';
+            noButton.style.color = '#ffffff';
+            noButton.style.borderRadius = '3px';
+            noButton.onclick = function () {
+                document.body.removeChild(overlay); // Close popup
+            };
+
+            // Append elements to popup and overlay
+            popup.appendChild(message);
+            popup.appendChild(yesButton);
+            popup.appendChild(noButton);
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
+        }
+
+        function removeItem(name, image) {
+            let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            cartItems = cartItems.filter(item => !(item.name === name && item.image === image));
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            displayCart();
+        }
+
+        function checkout() {
+            // Redirect to the pay.html page
+            window.location.href = 'pay.html';
+        }
+
+        displayCart();
+    </script>
+</body>
+</html>

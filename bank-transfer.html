@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yody - Thông tin chuyển khoản</title>
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/main_styles.css">
+    <style>
+        .bank-transfer-container {
+            margin-top: 100px;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="super_container">
+        <!-- Header (giống như trong pay.html) -->
+        
+        <div class="container bank-transfer-container">
+            <h2 class="mb-4">Thông tin chuyển khoản</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="alert alert-info">
+                        <p>Vui lòng chuyển khoản theo thông tin sau:</p>
+                        <p><strong>Ngân hàng:</strong> Vietcombank</p>
+                        <p><strong>Số tài khoản:</strong> 1234567890</p>
+                        <p><strong>Chủ tài khoản:</strong> CÔNG TY TNHH YODY</p>
+                        <p><strong>Nội dung chuyển khoản:</strong> [Mã đơn hàng] - [Tên của bạn]</p>
+                    </div>
+                    <p>Sau khi chuyển khoản, vui lòng nhập thông tin bên dưới:</p>
+                    <form id="bankTransferForm">
+                        <div class="form-group">
+                            <label for="transferDate">Ngày chuyển khoản</label>
+                            <input type="date" class="form-control" id="transferDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transferAmount">Số tiền chuyển khoản</label>
+                            <input type="number" class="form-control" id="transferAmount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transferName">Tên người chuyển khoản</label>
+                            <input type="text" class="form-control" id="transferName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Xác nhận đã chuyển khoản</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="styles/bootstrap4/popper.js"></script>
+    <script src="styles/bootstrap4/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('bankTransferForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Cảm ơn bạn đã xác nhận. Chúng tôi sẽ kiểm tra và xử lý đơn hàng của bạn trong thời gian sớm nhất.');
+            localStorage.removeItem('cartItems');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

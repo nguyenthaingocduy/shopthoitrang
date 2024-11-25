@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yody - Thanh toán</title>
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="plugins/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/main_styles.css">
+    <link rel="stylesheet" type="text/css" href="styles/responsive.css">
+    <link rel="stylesheet" type="text/css" href="styles/catalogue_styles.css">
+    <style>
+        .payment-container {
+            margin-top: 100px;
+            margin-bottom: 50px;
+        }
+        .cart-summary {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-items-container {
+            flex-grow: 1;
+            margin-bottom: 10px;
+        }
+        .cart-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .cart-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        .cart-total {
+            background-color: #f8f9fa;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+        .cart-item-details .price {
+            color: #2a2a86;
+            font-weight: bold;
+        }
+        .cart-total h5 {
+            color: #2a2a86;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="super_container">
+        <!-- Header -->
+        <header class="header trans_300">
+            <!-- Main Navigation -->
+            <div class="main_nav_container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <div class="logo_container">
+                                <!-- <a href="#">colo<span>shop</span></a> -->
+                                <a href="index.html">
+                                    <img src="images/yody/yody_logo.png" alt="Yody logo" style="border: none; width: 100%;">
+                                </a>
+                            </div>
+                            <nav class="navbar">
+                                <ul class="navbar_menu">
+                                    <li><a href="catalogue.html">shop</a></li>
+								    <li><a href="#">ưu đãi</a></li> <!--promotion.html-->
+								    <li><a href="#">tin tức</a></li> <!--blog.html-->
+								    <li><a href="contact.html">liên hệ</a></li>
+                                </ul>
+                                <ul class="navbar_user">
+                                    <li><a href="#"><i class="fa fa-search" aria-hidden="true"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i></a></li>
+                                    
+                                </ul>
+                                <div class="hamburger_container">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container payment-container">
+            <h2 class="mb-4 pt-4">Thanh toán</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <form id="paymentForm">
+                        <h4>Thông tin giao hàng</h4>
+                        <div class="form-group">
+                            <label for="fullName">Họ và tên</label>
+                            <input type="text" class="form-control" id="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Địa chỉ</label>
+                            <input type="text" class="form-control" id="address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone" required>
+                        </div>
+                        <h4 class="mt-4">Phương thức thanh toán</h4>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="codPayment" value="cod" checked>
+                            <label class="form-check-label" for="codPayment">
+                                Thanh toán khi nhận hàng (COD)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank">
+                            <label class="form-check-label" for="bankTransfer">
+                                Chuyển khoản ngân hàng
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Đặt hàng</button>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <div class="cart-summary">
+                        <h4>Tóm tắt đơn hàng</h4>
+                        <div class="cart-items-container" id="cartItems"></div>
+                        <div class="cart-total">
+                            <h5>Tổng cộng: <span id="totalPrice">₫0</span></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="styles/bootstrap4/popper.js"></script>
+    <script src="styles/bootstrap4/bootstrap.min.js"></script>
+    <script>
+        function displayCartSummary() {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const cartContainer = document.getElementById('cartItems');
+            let totalPrice = 0;
+
+            cartContainer.innerHTML = '';
+
+            cartItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                // Chuyển đổi giá thành số và định dạng lại thành VND
+                const price = parseInt(item.price.replace(/[^\d]/g, ''));
+                const totalItemPrice = price * item.quantity;
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="cart-item-details">
+                        <div>${item.name} x ${item.quantity}</div>
+                        <div class="price">${totalItemPrice.toLocaleString('vi-VN')}đ</div>
+                    </div>
+                `;
+                cartContainer.appendChild(itemElement);
+                totalPrice += totalItemPrice;
+            });
+
+            // Hiển thị tổng giá bằng VND
+            document.getElementById('totalPrice').textContent = totalPrice.toLocaleString('vi-VN') + 'đ';
+
+            // Điều chỉnh chiều cao của cart-summary dựa trên số lượng sản phẩm
+            const cartSummary = document.querySelector('.cart-summary');
+            if (cartItems.length > 2) {
+                cartSummary.style.height = '400px'; // Chiều cao tối đa khi có nhiều hơn 2 sản phẩm
+                cartContainer.style.overflowY = 'auto';
+            } else {
+                cartSummary.style.height = 'auto'; // Tự động điều chỉnh chiều cao khi có 2 sản phẩm hoặc ít hơn
+                cartContainer.style.overflowY = 'visible';
+            }
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            
+            if (paymentMethod === 'bank') {
+                // Chuyển hướng đến trang nhập thông tin chuyển khoản
+                window.location.href = 'bank-transfer.html';
+            } else {
+                // Xử lý đặt hàng COD
+                alert('Đơn hàng của bạn đã được đặt thành công!');
+                // Clear the cart after successful order
+                localStorage.removeItem('cartItems');
+                // Redirect to the home page or order confirmation page
+                window.location.href = 'index.html';
+            }
+        });
+
+        displayCartSummary();
+    </script>
+</body>
+</html>
