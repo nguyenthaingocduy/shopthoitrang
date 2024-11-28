@@ -1,5 +1,5 @@
 export default async (req, event) => {
-    const allowedIP = '123.456.78.90'; // Thay bằng IP cố định của bạn
+    const allowedIP = '192.168.1.3'; // Thay bằng IP cố định của bạn
     const clientIP = req.headers.get('x-forwarded-for') || req.ip;
   
     if (clientIP !== allowedIP) {
